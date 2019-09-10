@@ -7,7 +7,7 @@ class DBConneciton {
         if (this.Connection) {
             return this.Connection;
         }
-        this.Connection = mysql.createConnection("mysql://root:root@localhost:3306/database");
+        this.Connection = mysql.createConnection("mysql://root:root@localhost:3306/ecart");
         this.Connection.connect((err) => {
             if (err) console.error(err);
             console.log("MySql db connected successfully");
