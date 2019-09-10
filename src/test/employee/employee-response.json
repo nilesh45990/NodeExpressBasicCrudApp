@@ -1,0 +1,80 @@
+[
+    {
+        "empId": 1,
+        "empName": "nilesh chauhan",
+        "empEmail": "nilesh45990@gmail.com",
+        "empContact": "9924111345"
+    },
+    {
+        "empId": 6,
+        "empName": "Jay",
+        "empEmail": "jay@pmcretail.com",
+        "empContact": "5555555555"
+    },
+    {
+        "empId": 7,
+        "empName": "Sanket",
+        "empEmail": "sanket@pmcretail.com",
+        "empContact": "9924111345"
+    },
+    {
+        "empId": 8,
+        "empName": "Monil",
+        "empEmail": "monil.desai@pmcretail.com",
+        "empContact": "9922334455"
+    },
+    {
+        "empId": 9,
+        "empName": "Sahil",
+        "empEmail": "sahil.patel@pmcretail.com",
+        "empContact": "1234567898"
+    },
+    {
+        "empId": 10,
+        "empName": "KartiK",
+        "empEmail": "kartik.patel@pmcretail.com",
+        "empContact": "3456789120"
+    },
+    {
+        "empId": 11,
+        "empName": "Jayesh",
+        "empEmail": "jayesh.patel@pmcretail.com",
+        "empContact": "3456789120"
+    },
+    {
+        "empId": 12,
+        "empName": "Jayesh",
+        "empEmail": "jayesh.patel@pmcretail.com",
+        "empContact": "3456789120"
+    },
+    {
+        "empId": 13,
+        "empName": "Jayesh",
+        "empEmail": "jayesh.patel@pmcretail.com",
+        "empContact": "3456789120"
+    },
+    {
+        "empId": 14,
+        "empName": "Nitin",
+        "empEmail": "nitin@pmcretail.com",
+        "empContact": "3456789120"
+    },
+    {
+        "empId": 15,
+        "empName": "Nitin",
+        "empEmail": "nitin.patel@pmcretail.com",
+        "empContact": "3456789120"
+    },
+    {
+        "empId": 16,
+        "empName": "Harshraj",
+        "empEmail": "harshraj@pmcretail.com",
+        "empContact": "9988774455"
+    },
+    {
+        "empId": 17,
+        "empName": "Harshraj",
+        "empEmail": "harshraj@pmcretail.com",
+        "empContact": "9988774455"
+    }
+]
