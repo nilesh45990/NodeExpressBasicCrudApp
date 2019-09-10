@@ -1,5 +1,5 @@
 import userDao from '../dao/user-dao';
-import { Router, Request, Response } from 'express';
+import { Request } from 'express';
 import { GenericResponse, StatusCode } from '../util/generic-response';
 import { UserDto } from '../dto/user-dto';
 class UserService {

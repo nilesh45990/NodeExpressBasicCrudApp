@@ -9,7 +9,7 @@ import { Address } from '../dto/address';
 
 class OrderService {
 
-    async getCustomerOrders(request: Request): Promise<GenericResponse<Array<[number, OrderReportDto]>>> {
+    async getCustomerOrders(request: Request): Promise<GenericResponse<Array<[number, OrderReportDto] | string>>> {
         try {
             const customerId: number = parseInt(request.params.customerId);
             return new GenericResponse<Array<[number, OrderReportDto]>>().setResponse(Array.from(await orderDao.getCustomerOrders(customerId)));
@@ -23,7 +23,6 @@ class OrderService {
             const customerId: number = req.body.customerId;
             let order: OrderDto = <OrderDto>req.body;
             order.date = new Date();
-            order.type = "order";
             order.status = OrderStatus.ORDER_PLACED;
             const orderDto: OrderDto = await orderDao.saveOrder(order);
             const message: string = await cartDao.updateOrderId(order.id, order.customerId);
@@ -40,7 +39,9 @@ class OrderService {
             if (!orders.length) {
                 return new GenericResponse<string>().setCode(StatusCode.ERROR).setResponse([`Order with order id ${orderId} is not found !`]);
             }
-            const address: string = await orderDao.saveAddress(orderId, <Address>req.body);
+            let address: Address = <Address>req.body;
+            address.orderId = orderId;
+            address = await orderDao.saveAddress(address);
             return new GenericResponse<string>().setMessage("Address saved successfully").setCode(StatusCode.CREATED);
         } catch (error) {
             return new GenericResponse<string>().setCode(StatusCode.ERROR).setResponse(error);

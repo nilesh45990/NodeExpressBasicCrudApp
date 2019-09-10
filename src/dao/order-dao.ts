@@ -1,44 +1,45 @@
-import { bucket, N1qlQuery } from '../config/connection'
+import con from '../config/db-connection';
 import * as dotenv from 'dotenv';
 import { OrderDto } from '../dto/order-dto';
 import { OrderReportDto } from '../dto/order-report-dto';
 import { OrderLineDto } from '../dto/order-line-dto';
 import { Address } from '../dto/address';
+
 dotenv.config();
 
 class OrderDao {
 
     getOrderById(orderId: number): Promise<OrderDto[]> {
-        const sql = N1qlQuery.fromString(` SELECT * FROM demo  where type='order' and id = $1 `);
+        const sql = ` SELECT * FROM order where id = ? `;
         return new Promise((resolve, rejects) => {
-            bucket.query(sql, [orderId], (error, result) => {
-                if (error) rejects(error.message);
-                resolve(result.map(result => result));
+            con.query(sql, [orderId], (err, result) => {
+                if (err) rejects(err.message);
+                resolve(result);
             });
         });
     }
 
     getCustomerOrders(customerId: number): Promise<Map<number, OrderReportDto>> {
-        const sql = N1qlQuery.fromString(` SELECT o.id orderId, p.name, ol.quantity, (p.price * ol.quantity) total_amount , o.shippingAddress 
-                                            FROM demo o 
-                                            inner join demo ol on o.id = ol.orderId and ol.type = 'order_line'
-                                            INNER JOIN demo p on ol.productId = p.id and p.type = 'product'  
-                                            where o.type='order' and o.customerId = $1 `);
+        const sql = ` SELECT o.id orderId, p.name, ol.quantity, (p.price * ol.quantity) total_amount , o.shippingAddress 
+                                            FROM order o 
+                                            inner join order_line ol on o.id = ol.orderId 
+                                            INNER JOIN product p on ol.productId = p.id 
+                                            where o.customerId = ? `;
 
         return new Promise((resolve, rejects) => {
-            bucket.query(sql, [customerId], (error, result) => {
+            con.query(sql, [customerId], (error, result: any) => {
                 if (error) rejects(error.message);
-                const response = result.map(result => result);
+                const response = result.map((result: any) => result);
                 let orderMap: Map<number, OrderReportDto> = new Map();
-                response.forEach((key, value) => {
+                response.forEach((key: any, value: string) => {
                     if (orderMap.get(key.orderId) != null) {
                         let orderDetail: OrderReportDto = orderMap.get(key.orderId);
                         orderDetail.orderId = key.orderId;
                         orderDetail.totalAmount = orderDetail.totalAmount + parseInt(key.total_amount);
                         orderDetail.shippingAddress = key.shippingAddress;
-                        let existingLineList: OrderLineDto[] = orderDetail.orderLines;
+                        let existingLineList: OrderLineDto[] = orderDetail.items;
                         let orderLineDto: OrderLineDto = new OrderLineDto();
-                        orderLineDto.productName = key.name;
+                        // orderLineDto.productName = key.name;
                         orderLineDto.quantity = key.quantity;
                         existingLineList.push(orderLineDto);
                         orderMap.set(key.orderId, orderDetail);
@@ -49,10 +50,10 @@ class OrderDao {
                         orderDetail.shippingAddress = key.shippingAddress;
                         let orderLineList: OrderLineDto[] = new Array<OrderLineDto>();
                         let orderLineDto: OrderLineDto = new OrderLineDto();
-                        orderLineDto.productName = key.name;
+                        // orderLineDto.productName = key.name;
                         orderLineDto.quantity = key.quantity;
                         orderLineList.push(orderLineDto);
-                        orderDetail.orderLines = orderLineList;
+                        orderDetail.items = orderLineList;
                         orderMap.set(key.orderId, orderDetail);
                     }
                 });
@@ -62,26 +63,24 @@ class OrderDao {
     }
 
     saveOrder(orderDto: OrderDto): Promise<OrderDto> {
-        var key = "order";
+        const sql = `INSERT INTO order(customerId,status) VALUE(?,?)`
         return new Promise((resolve, rejects) => {
-            bucket.counter(key, 1, { initial: 1 }, (err, res) => {
-                if (err) throw err;
-                const orderId = res.value;
-                orderDto.id = orderId;
-                bucket.insert(key + "::" + orderId, orderDto, (err, res) => {
-                    if (err) rejects(err.message);
-                    resolve(orderDto);
-                });
+            con.query(sql, [orderDto.customerId, orderDto.status], (err, result) => {
+                if (err) rejects(err.message);
+                orderDto.id = result.insertId;
+                resolve(orderDto);
             });
         });
     }
 
-    saveAddress(orderId: number, address: Address): Promise<string> {
-        const sql = N1qlQuery.fromString(` update demo set shippingAddress = $1 where id = $2  and type='order' `);
+    saveAddress(address: Address): Promise<Address> {
+        const sql = ` INSERT INTO address(customerId,type,line1,line2,city,state,country,orderId) VALUE(?,?,?,?,?,?,?,?) `;
         return new Promise((resolve, rejects) => {
-            bucket.query(sql, [address, orderId], (err, res) => {
+            con.query(sql, [address.customerId, address.type, address.line1, address.line2, address.city, address.state,
+            address.country, address.orderId], (err, res) => {
                 if (err) rejects(err.message);
-                resolve("Address saved successfully!");
+                address.id = res.insertId;
+                resolve(address);
             });
         });
     }

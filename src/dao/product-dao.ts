@@ -1,13 +1,11 @@
 import con from '../config/db-connection';
-import { bucket, N1qlQuery } from '../config/connection'
 import * as dotenv from 'dotenv';
-import { ProductDto } from '../dto/product-dto';
-import { Context } from 'mocha';
+import { ProductDto as Product } from '../dto/product-dto';
 dotenv.config();
 
 class ProductDao {
 
-    getAllProduct(): Promise<ProductDto[]> {
+    getAllProduct(): Promise<Product[]> {
 
         const sql = `SELECT id,name,price,image,description FROM product where status=true `;
         return new Promise((resolve, rejects) => {
@@ -18,7 +16,7 @@ class ProductDao {
         });
     }
 
-    getProductById(productId: number): Promise<ProductDto[]> {
+    getProductById(productId: number): Promise<Product[]> {
         const sql = ` SELECT id,name,price,image,description FROM product where status=true and id = ?`;
         return new Promise((resolve, rejects) => {
             con.query(sql, [productId], (err, result) => {
@@ -28,26 +26,28 @@ class ProductDao {
         });
     }
 
-    saveProduct(productDto: ProductDto): Promise<ProductDto> {
-        const sql = `INSERT INTO product(name,price,image,description) VALUE(?,?,?,?)`;
+    saveProduct(product: Product): Promise<Product> {
+        const sql = `INSERT INTO product(name,price,image,description,createdBy,createdDate) VALUE(?,?,?,?,?,SYSDATE())`;
         return new Promise((resolve, rejects) => {
-            con.query(sql, [productDto.name, productDto.price, productDto.image, productDto.description], (err, result) => {
+            con.query(sql, [product.name, product.price, product.image, product.description, product.createdBy], (err, result) => {
                 if (err) rejects(err.message);
-                productDto.id = result.insertId;
-                resolve(productDto);
+                product.id = result.insertId;
+                resolve(product);
             });
         });
     }
 
-    updateProduct(productId: number, product: ProductDto): Promise<ProductDto> {
-
-        const sql = ` UPDATE product SET name=?, price=?, image=?, description=? WHERE id=? `;
+    updateProduct(productId: number, product: Product): Promise<Product> {
+        console.log(product);
+        const sql = ` UPDATE product SET name=?, price=?, image=?, description=?,updatedBy=?,updatedDate=SYSDATE() WHERE id=? `;
         return new Promise((resolve, rejects) => {
-            con.query(sql, [product.name, product.price, product.image, product.description, productId], (error, result) => {
-                if (error) rejects(error.message);
-                product.id = productId;
-                resolve(product);
-            });
+            con.query(sql, [product.name, product.price, product.image, product.description, product.updatedBy, productId],
+                (error, result) => {
+                    if (error) rejects(error.message);
+                    console.log(result)
+                    product.id = productId;
+                    resolve(product);
+                });
         });
     }
 

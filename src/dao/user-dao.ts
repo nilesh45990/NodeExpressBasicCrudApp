@@ -1,4 +1,4 @@
-import { bucket, N1qlQuery } from '../config/connection'
+import con from '../config/db-connection';
 import { UserDto } from '../dto/user-dto';
 import * as dotenv from 'dotenv';
 
@@ -7,13 +7,11 @@ dotenv.config();
 class UserDao {
 
     getUserByUserNamePassword(userName: string, password: string): Promise<UserDto[]> {
-        const sql = N1qlQuery.fromString(" SELECT id userId,userName,`role`  FROM demo  where type='user' and userName = $1  and pwd=$2 ");
+        const sql = " SELECT id userId,name userName,`role`  FROM user where name = ?  and password=? ";
         return new Promise((resolve, rejects) => {
-            bucket.query(sql, [userName, password], (error, result) => {
-                console.log(error);
+            con.query(sql, [userName, password], (error, result) => {
                 if (error) rejects(error.message);
-                console.log(result);
-                resolve(result.map(result => result));
+                resolve(result);
             });
         });
     }
