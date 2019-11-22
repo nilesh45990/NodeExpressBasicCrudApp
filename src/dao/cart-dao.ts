@@ -52,7 +52,7 @@ class CartDao {
     // call when order is placed
     updateOrderId(orderId: number, customerId: number): Promise<string> {
         const sql = `UPDATE order_line SET orderId =?
-                    where ol.orderId IS NULL and ol.customerId=? `;
+                    where orderId IS NULL and customerId=? `;
         return new Promise((resolve, rejects) => {
             con.query(sql, [orderId, customerId], (error, result) => {
                 if (error) rejects(error.message);
@@ -74,7 +74,7 @@ class CartDao {
     }
 
     updateItemOfCart(orderLineId: number, orderLineDto: OrderLineDto): Promise<OrderLineDto> {
-        const sql = `UPDATE order_line SET quantity = ? where  ol.id=?`;
+        const sql = `UPDATE order_line SET quantity = ? where  id=?`;
         return new Promise((resolve, rejects) => {
             con.query(sql, [orderLineDto.quantity, orderLineId], (err, res) => {
                 if (err) rejects(err.message);

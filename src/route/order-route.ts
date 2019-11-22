@@ -12,7 +12,7 @@ class OrderRoute {
             res.send(await orderService.getCustomerOrders(req));
         });
         // place order of customer
-        this.router.route('/').post(async (req: Request, res: Response) => {
+        this.router.route('/:customerId').put(async (req: Request, res: Response) => {
             logger.info('create order called');
             res.send(await orderService.saveOrder(req));
         });

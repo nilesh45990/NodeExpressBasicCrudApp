@@ -10,7 +10,7 @@ dotenv.config();
 class OrderDao {
 
     getOrderById(orderId: number): Promise<OrderDto[]> {
-        const sql = ` SELECT * FROM order where id = ? `;
+        const sql = ` SELECT * FROM orders where id = ? `;
         return new Promise((resolve, rejects) => {
             con.query(sql, [orderId], (err, result) => {
                 if (err) rejects(err.message);
@@ -20,8 +20,8 @@ class OrderDao {
     }
 
     getCustomerOrders(customerId: number): Promise<Map<number, OrderReportDto>> {
-        const sql = ` SELECT o.id orderId, p.name, ol.quantity, (p.price * ol.quantity) total_amount , o.shippingAddress 
-                                            FROM order o 
+        const sql = ` SELECT o.id orderId, p.name,p.price, ol.quantity, (p.price * ol.quantity) total_amount  
+                                            FROM orders o 
                                             inner join order_line ol on o.id = ol.orderId 
                                             INNER JOIN product p on ol.productId = p.id 
                                             where o.customerId = ? `;
@@ -39,8 +39,9 @@ class OrderDao {
                         orderDetail.shippingAddress = key.shippingAddress;
                         let existingLineList: OrderLineDto[] = orderDetail.items;
                         let orderLineDto: OrderLineDto = new OrderLineDto();
-                        // orderLineDto.productName = key.name;
+                        orderLineDto.productName = key.name;
                         orderLineDto.quantity = key.quantity;
+                        orderLineDto.price = key.price;
                         existingLineList.push(orderLineDto);
                         orderMap.set(key.orderId, orderDetail);
                     } else {
@@ -50,8 +51,9 @@ class OrderDao {
                         orderDetail.shippingAddress = key.shippingAddress;
                         let orderLineList: OrderLineDto[] = new Array<OrderLineDto>();
                         let orderLineDto: OrderLineDto = new OrderLineDto();
-                        // orderLineDto.productName = key.name;
+                        orderLineDto.productName = key.name;
                         orderLineDto.quantity = key.quantity;
+                        orderLineDto.price = key.price;
                         orderLineList.push(orderLineDto);
                         orderDetail.items = orderLineList;
                         orderMap.set(key.orderId, orderDetail);
@@ -63,7 +65,7 @@ class OrderDao {
     }
 
     saveOrder(orderDto: OrderDto): Promise<OrderDto> {
-        const sql = `INSERT INTO order(customerId,status) VALUE(?,?)`
+        const sql = `INSERT INTO orders(customerId,status) VALUE(?,?)`
         return new Promise((resolve, rejects) => {
             con.query(sql, [orderDto.customerId, orderDto.status], (err, result) => {
                 if (err) rejects(err.message);

@@ -1,4 +1,5 @@
 import { Request } from 'express';
+var http = require("request");
 import { OrderDto } from '../dto/order-dto';
 import orderDao from '../dao/order-dao';
 import cartDao from '../dao/cart-dao';
@@ -6,6 +7,7 @@ import { GenericResponse, StatusCode } from '../util/generic-response';
 import { OrderReportDto } from '../dto/order-report-dto';
 import { OrderStatus } from '../util/order-status';
 import { Address } from '../dto/address';
+
 
 class OrderService {
 
@@ -20,8 +22,9 @@ class OrderService {
 
     async saveOrder(req: Request): Promise<GenericResponse<OrderDto>> {
         try {
-            const customerId: number = req.body.customerId;
-            let order: OrderDto = <OrderDto>req.body;
+            const customerId: number = req.params.customerId;
+            let order: OrderDto = new OrderDto();
+            order.customerId = customerId;
             order.date = new Date();
             order.status = OrderStatus.ORDER_PLACED;
             const orderDto: OrderDto = await orderDao.saveOrder(order);
