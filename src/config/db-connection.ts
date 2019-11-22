@@ -7,7 +7,7 @@ class DBConneciton {
         if (this.Connection) {
             return this.Connection;
         }
-        this.Connection = mysql.createConnection("mysql://root:root@localhost:3306/ecart");
+        this.Connection = mysql.createConnection(`mysql://${process.env.USER_NAME}:${process.env.PASSWORD}@${process.env.DATABASE_URL}/${process.env.DATABASE}`);
         this.Connection.connect((err) => {
             if (err) console.error(err);
             console.log("MySql db connected successfully");

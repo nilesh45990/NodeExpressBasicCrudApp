@@ -1,7 +1,6 @@
 import * as winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import * as dotenv from 'dotenv';
-import { Allow } from 'class-validator';
 
 export enum LoggerLevel {
     A0 = 'ALL',

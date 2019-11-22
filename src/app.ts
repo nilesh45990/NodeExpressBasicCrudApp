@@ -15,7 +15,7 @@ class App {
 
         this.app.all('*', (req: Request, res: Response, next) => {
             res.header('Access-Control-Allow-Origin', '*');
-            res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+            res.setHeader('Access-Control-Allow-Origin',  `${process.env.FRONT_URL}`);
             res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
             res.setHeader('Access-Control-Allow-Credentials', 'true');
             res.setHeader('Access-Control-Allow-Methods', "GET, POST, PUT, DELETE");
@@ -29,8 +29,6 @@ class App {
         this.app.use('/v1/orders', orderRoute);
         this.app.use('/v1/users', userRoute);
         this.app.use('/v1/logs', loggerRoute);
-
-
     }
 }
 export default new App().app;
